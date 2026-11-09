@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#b8446a" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="棉鞋花样" />
+<meta name="application-name" content="棉鞋花样" />
+<meta name="format-detection" content="telephone=no" />
+<title>棉鞋编织花样设计器</title>
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="icon" type="image/png" sizes="32x32" href="icons/icon-32.png" />
+<link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<div id="app">
+
+  <header class="topbar">
+    <button class="btn icon menu-btn menu-only" data-action="menu" title="显示/隐藏面板">☰</button>
+
+    <div class="brand">
+      <span class="logo">🧶</span>
+      <div class="brand-text">
+        <strong>棉鞋编织花样设计器</strong>
+        <span id="designName">未命名花样</span>
+      </div>
+    </div>
+
+    <div class="topbar-actions">
+      <span class="group desktop-only">
+        <button class="btn" data-action="new">新建</button>
+      </span>
+      <span class="group desktop-only">
+        <button class="btn" data-action="exportPng">导出图片</button>
+        <button class="btn" data-action="saveLocal">保存到本地</button>
+        <button class="btn" data-action="loadLocal">载入文件</button>
+      </span>
+      <span class="divider desktop-only"></span>
+      <button class="btn icon" id="btnUndo" data-action="undo" title="撤销 (Ctrl+Z)">↶</button>
+      <button class="btn icon" id="btnRedo" data-action="redo" title="重做 (Ctrl+Shift+Z)">↷</button>
+      <span class="divider desktop-only"></span>
+      <span class="group desktop-only">
+        <button class="btn icon" data-action="zoomOut" title="缩小">−</button>
+        <span class="zoom-label" id="zoomLabel">10 px/格</span>
+        <button class="btn icon" data-action="zoomIn" title="放大">＋</button>
+        <button class="btn" data-action="fit" title="适应窗口">适应</button>
+      </span>
+    </div>
+  </header>
+
+  <div class="workspace">
+
+    <aside class="sidebar" id="sidebar">
+
+      <section class="panel">
+        <h2>本地文件</h2>
+        <div class="row-btns">
+          <button class="btn small" data-action="saveLocal">保存到本地</button>
+          <button class="btn small" data-action="loadLocal">载入文件</button>
+        </div>
+        <div class="row-btns">
+          <button class="btn small" data-action="restoreLast" title="把最近一次被覆盖前的内容找回来">恢复上次内容</button>
+        </div>
+        <p class="muted">
+          格式为 <code>.mianxie.json</code>（版本化 JSON，一个文件里可以装单个花样或一整份备份）。
+          iPad / iPhone 上会弹系统分享面板，可直接存到「文件」App，或用 AirDrop、微信发出去。
+          另外，执行「新建 / 载入文件 / 载入示例」这类会覆盖画板的操作前，系统会自动留一份底，点「恢复上次内容」可找回。
+        </p>
+      </section>
+
+      <section class="panel mobile-only">
+        <h2>文件与视图</h2>
+        <div class="row-btns">
+          <button class="btn small" data-action="new">新建</button>
+        </div>
+        <div class="row-btns">
+          <button class="btn small" data-action="exportPng">导出图片</button>
+          <button class="btn small" data-action="saveLocal">保存到本地</button>
+          <button class="btn small" data-action="loadLocal">载入文件</button>
+        </div>
+        <div class="row-btns align-center">
+          <button class="btn small" data-action="zoomOut">缩小</button>
+          <span class="zoom-label" id="zoomLabelMobile">10 px/格</span>
+          <button class="btn small" data-action="zoomIn">放大</button>
+          <button class="btn small" data-action="fit">适应</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>工具</h2>
+        <div class="tool-grid" id="toolGrid">
+          <button class="tool" data-tool="select"><i>🖱️</i><span>选择填色</span><em>V</em></button>
+          <button class="tool" data-tool="lasso"><i>➰</i><span>套索</span><em>S</em></button>
+          <button class="tool" data-tool="brush"><i>✏️</i><span>画笔</span><em>B</em></button>
+          <button class="tool" data-tool="eraser"><i>🧽</i><span>橡皮</span><em>E</em></button>
+          <button class="tool" data-tool="fill"><i>🪣</i><span>油漆桶</span><em>G</em></button>
+          <button class="tool" data-tool="line"><i>📏</i><span>直线</span><em>L</em></button>
+          <button class="tool" data-tool="rect"><i>▭</i><span>矩形</span><em>R</em></button>
+          <button class="tool" data-tool="eyedropper"><i>💧</i><span>吸管</span><em>I</em></button>
+          <button class="tool" data-tool="pan"><i>✋</i><span>移动</span><em>H</em></button>
+          <button class="tool" data-tool="note"><i>📝</i><span>注释</span><em>N</em></button>
+        </div>
+        <p class="muted tip">
+          <b>填色方法</b>：点一下格子选中它（也可以按住拖出一块区域），再点下面的颜色就能上色。<br />
+          <b>画笔</b>：按住拖动可以像真笔一样连续画（支持 Apple Pencil 压感笔迹、鼠标拖拽）。<br />
+          <b>套索</b>：按住自由圈选任意形状，圈完就能复制 / 剪切 / 粘贴 / 填色。<br />
+          <b>选区</b>：框选或套索后，<b>在选区里按住拖动就能直接搬走这块内容</b>；点「复制 / 剪切」也会变成可拖动的浮动块，拖到位置后点「放下」。
+        </p>
+        <label class="check"><input type="checkbox" id="rectFill" /> 矩形工具填充实心</label>
+        <label class="check"><input type="checkbox" id="gridOverFill" /> 填色区域也显示网格线</label>
+        <label class="check"><input type="checkbox" id="darkBorder" /> 深色表格边框（压在色块上，导出可见）</label>
+        <div class="row-btns">
+          <button class="btn small" data-action="sample">示例花样</button>
+          <button class="btn small danger" data-action="clear">清空全部</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>注释 <span class="annotation-count" id="annotationCount">0</span></h2>
+        <div class="toggle-row note-style-row" id="annotationStylePicker">
+          <button class="toggle" data-note-style="callout">箭头标注</button>
+          <button class="toggle" data-note-style="poster">后期文字</button>
+          <button class="toggle" data-note-style="textbox">PPT 文本框</button>
+        </div>
+        <p class="muted">选择「注释」工具后点击任意格子添加；同一格再次点击可编辑。可在“箭头标注”和直接叠在图案上的“后期文字”之间切换，导出图片时自动保留。</p>
+        <div class="annotation-list" id="annotationList"></div>
+      </section>
+
+      <section class="panel">
+        <h2>调色板</h2>
+        <div class="current-color">
+          <span class="swatch-lg" id="currentSwatch"></span>
+          <div class="current-meta">
+            <strong id="currentColorName">白</strong>
+            <code id="currentColorHex">#FFFFFF</code>
+          </div>
+          <label class="add-color" title="自定义颜色">
+            <input type="color" id="customColor" value="#c62828" />
+            <span>＋</span>
+          </label>
+        </div>
+        <div class="palette" id="palette"></div>
+        <div class="recent">
+          <span class="label">最近使用</span>
+          <div class="recent-list" id="recentList"></div>
+        </div>
+        <div class="row-btns">
+          <button class="btn small" data-action="eraseSel">清除选区颜色</button>
+          <button class="btn small" data-action="selectAll">全选网格</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>对称与重复</h2>
+        <div class="toggle-row">
+          <button class="toggle" id="tglMirrorX" title="左右同时绘制">左右镜像</button>
+          <button class="toggle" id="tglMirrorY" title="上下同时绘制">上下镜像</button>
+          <button class="toggle" id="tglCenter" title="中心点对称（旋转 180°）">中心对称</button>
+        </div>
+        <label class="check"><input type="checkbox" id="tglRepeat" /> 单元图案重复铺满整张网格</label>
+        <div class="repeat-size">
+          <label>单元宽 <input type="number" id="repeatW" min="2" max="400" value="20" /></label>
+          <label>单元高 <input type="number" id="repeatH" min="2" max="400" value="20" /></label>
+        </div>
+        <p class="muted">提示：先开「左右镜像」，只画左半边就能得到对称花样。</p>
+      </section>
+
+      <section class="panel">
+        <h2>用量统计</h2>
+        <div class="stats" id="stats"></div>
+      </section>
+
+      <section class="panel desktop-only">
+        <h2>快捷键</h2>
+        <ul class="keys">
+          <li><kbd>V</kbd><kbd>S</kbd><kbd>B</kbd><kbd>E</kbd><kbd>G</kbd><kbd>L</kbd><kbd>R</kbd><kbd>I</kbd><kbd>N</kbd> 切换工具</li>
+          <li><kbd>1</kbd>–<kbd>9</kbd> 快速选色（会填入选区）</li>
+          <li><kbd>Ctrl</kbd>+<kbd>C</kbd>/<kbd>X</kbd>/<kbd>V</kbd> 复制 / 剪切 / 粘贴</li>
+          <li><kbd>Shift</kbd>+<kbd>H</kbd>/<kbd>V</kbd>/<kbd>R</kbd> 选区左右翻 / 上下翻 / 旋转 90°</li>
+          <li><kbd>Ctrl</kbd>+<kbd>A</kbd> 全选 · <kbd>Delete</kbd> 清除选区</li>
+          <li><kbd>Ctrl</kbd>+<kbd>Z</kbd> 撤销 · <kbd>Ctrl</kbd>+<kbd>S</kbd> 保存</li>
+          <li>空格 / 中键拖动平移，<kbd>Ctrl</kbd>+滚轮缩放</li>
+        </ul>
+      </section>
+    </aside>
+
+    <main class="canvas-wrap" id="canvasWrap">
+      <canvas id="board"></canvas>
+      <div class="selbar" id="selBar">
+        <span class="sel-info" id="selInfo">选区</span>
+        <span class="sel-group normal-actions">
+          <button class="btn small" data-action="copySel" title="复制出来，直接拖动放置 (Ctrl+C)">复制</button>
+          <button class="btn small" data-action="cutSel" title="剪切出来，直接拖动放置 (Ctrl+X)">剪切</button>
+          <button class="btn small" data-action="paste" title="粘贴到选区左上角 (Ctrl+V)">粘贴</button>
+        </span>
+        <span class="sel-group transform-actions">
+          <button class="btn small" data-action="flipH" title="左右翻转选区内容 (Shift+H)">⇄ 左右翻</button>
+          <button class="btn small" data-action="flipV" title="上下翻转选区内容 (Shift+V)">⇅ 上下翻</button>
+          <button class="btn small" data-action="rotateSel" title="顺时针旋转 90° (Shift+R)">⟳ 旋转</button>
+        </span>
+        <span class="sel-group normal-actions">
+          <button class="btn small" data-action="clearSel" title="清除选区内容 (Delete)">清除</button>
+          <button class="btn small" data-action="deselect" title="取消选区 (Esc)">取消</button>
+        </span>
+        <span class="sel-group float-actions">
+          <button class="btn small primary" data-action="floatCommit" title="放下 (Enter)">放下</button>
+          <button class="btn small" data-action="floatCancel" title="取消 (Esc)">取消</button>
+        </span>
+      </div>
+    </main>
+  </div>
+
+  <div class="colorstrip mobile-only" id="colorStrip"></div>
+
+  <footer class="statusbar">
+    <span id="statusSel">选区：—</span>
+    <span id="statusFilled">已填色：0 / 14400</span>
+    <span id="statusSave">未保存</span>
+    <span class="spacer"></span>
+    <span id="statusCursor">光标：—</span>
+  </footer>
+</div>
+
+<div class="modal-root hidden" id="modalRoot">
+  <div class="modal">
+    <h3 id="modalTitle">标题</h3>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-actions" id="modalActions"></div>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+<input type="file" id="fileInput" accept=".json,application/json" hidden />
+
+<script>
+  // 注册 Service Worker（HTTPS 或 localhost 下启用离线缓存）
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+      navigator.serviceWorker.register('sw.js').catch(function () { /* 忽略 */ });
+    });
+  }
+</script>
+<script src="app.js"></script>
+</body>
+</html>
