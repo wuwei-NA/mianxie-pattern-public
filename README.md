@@ -56,3 +56,11 @@ mianxie-pattern-public/
 ## 安全边界
 
 公开仓库不包含服务端程序、部署配置、服务器地址、密码、API 令牌、SSH 私钥或 TLS 私钥。提交前仍建议执行一次敏感信息检查；具体规则见 [SECURITY.md](SECURITY.md)。
+
+## 许可证
+
+本项目采用 GNU Affero General Public License v3.0 only
+（SPDX：`AGPL-3.0-only`）授权，完整条款见 [LICENSE](LICENSE)。
+
+如果修改本程序并通过网络向用户提供服务，需要按照 AGPL
+向这些用户提供对应的完整源码。
